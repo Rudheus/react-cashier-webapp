@@ -1,13 +1,12 @@
 #!/bin/sh
 echo "Waiting for database..."
-until pg_isready -h $DB_HOST -U $DB_USER -p $DB_PORT; do
+until pg_isready -h $DB_HOST -p $DB_PORT -U $DB_USER ; do
   sleep 1
 done
+echo "DB_NAME is: $DB_NAME"
 echo "Database ready! Running schema..."
-PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -U $DB_USER -d $DB_NAME -f /app/src/db/schema.sql
-
-echo "Creating default users..."
+PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -f /app/src/db/schema.sql
+echo "Schema done. Creating default users..."
 node /app/src/db/createAdmin.js
-
 echo "Done! Starting server..."
 npm run dev
