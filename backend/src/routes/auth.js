@@ -38,6 +38,58 @@ router.post('/register', async (req, res) => {
   }
 })
 
+// Setup awal — hanya bisa dipakai jika belum ada owner
+router.post('/setup', async (req, res) => {
+  try {
+    // Cek apakah sudah ada owner
+    const existing = await pool.query(
+      "SELECT * FROM users WHERE role = 'owner'"
+    )
+    if (existing.rows.length > 0) {
+      return res.status(403).json({ 
+        message: 'Setup sudah dilakukan, endpoint ini ditutup' 
+      })
+    }
+
+    const { name, email, password } = req.body
+
+    // Validasi input
+    if (!name || !email || !password) {
+      return res.status(400).json({ 
+        message: 'Nama, email, dan password wajib diisi' 
+      })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    const result = await pool.query(
+      'INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, role',
+      [name, email, hashedPassword, 'owner']
+    )
+
+    res.status(201).json({
+      message: 'Owner berhasil dibuat! Endpoint ini sekarang ditutup.',
+      user: result.rows[0]
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Server error' })
+  }
+})
+
+//cek sudah setup atau tidak
+// Cek apakah setup sudah dilakukan
+router.get('/check-setup', async (req, res) => {
+  try {
+    const existing = await pool.query(
+      "SELECT id FROM users WHERE role = 'owner' LIMIT 1"
+    )
+    res.json({ setupDone: existing.rows.length > 0 })
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' })
+  }
+})
+
 // LOGIN
 router.post('/login', async (req, res) => {
   try {

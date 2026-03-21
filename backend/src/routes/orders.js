@@ -3,6 +3,10 @@ const router = express.Router();
 const pool = require('../db/index');
 const {authenticate, authorize} = require('../middleware/auth');
 
+function CatchError(){
+    console.error(err);
+        res.status(500).json({ message : 'Terjadi kesalahan pada server' })
+}
 
 // POST buat order baru )cashier, manager, owner)
 router.post('/', authenticate, async (req, res) => {
@@ -36,7 +40,7 @@ router.post('/', authenticate, async (req, res) => {
         // Simpan Orderan
         const order = await client.query(
             'INSERT INTO orders (cashier_id, total, status, payment_method) VALUES ($1, $2, $3, $4) RETURNING *',
-            [req.user.id, total, 'pending', payment_method]
+            [req.user.id, total, 'completed', payment_method]
         )
           // Simpan order items dan kurangi stok
         for (const item of items) {
@@ -66,8 +70,7 @@ router.post('/', authenticate, async (req, res) => {
 
 } catch (err) {
         await client.query('ROLLBACK')
-        console.error(err);
-        res.status(500).json({ message : 'Terjadi kesalahan pada server' })
+        CatchError()
 } finally {        
     client.release();
     }
@@ -84,8 +87,7 @@ router.get('/', authenticate, authorize('manager', 'owner'), async (req, res) =>
     `)
     res.json(result.rows)
        }catch (err) {
-        console.error(err);
-        res.status(500).json({ message : 'Terjadi kesalahan pada server' })
+        CatchError()
     }
 })
 
@@ -111,8 +113,7 @@ router.get('/:id', authenticate, async (req, res) => {
             items : items.rows
         })
     }catch (err) {
-        console.error(err);
-        res.status(500).json({ message : 'Terjadi kesalahan pada server' })
+        CatchError()
     }
 })
 
