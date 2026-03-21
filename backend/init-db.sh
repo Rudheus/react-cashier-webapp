@@ -1,6 +1,6 @@
 #!/bin/sh
 echo "Waiting for database..."
-until pg_isready -h $DB_HOST -U $DB_USER -d $DB_NAME; do
+until pg_isready -h $DB_HOST -U $DB_USER ; do
   sleep 1
 done
 echo "Database ready! Running schema..."
