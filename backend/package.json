@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon src/app.js",
     "start": "sh init-db.sh"
-  }
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
