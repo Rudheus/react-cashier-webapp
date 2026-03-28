@@ -22,4 +22,4 @@ echo "Creating default users..."
 node /app/src/db/createAdmin.js
 
 echo "Done! Starting server..."
-node src/app.js1
+node src/app.js
