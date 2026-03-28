@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Use 'npm ci' for a clean, reliable install from the lockfile
-RUN npm ci
+RUN npm install
 
 COPY . .
 
