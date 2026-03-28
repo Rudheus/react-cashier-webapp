@@ -69,8 +69,8 @@ router.post('/', authenticate, async (req, res) => {
     });
 
 } catch (err) {
-        await client.query('ROLLBACK')
-        CatchError()
+        await client.query('ROLLBACK');
+        CatchError(err, res);
 } finally {        
     client.release();
     }
@@ -87,7 +87,7 @@ router.get('/', authenticate, authorize('manager', 'owner'), async (req, res) =>
     `)
     res.json(result.rows)
        }catch (err) {
-        CatchError()
+        CatchError(err, res)
     }
 })
 
